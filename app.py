@@ -390,13 +390,13 @@ class EmployeeCardGenerator:
                 st.error(f"Error creating default logo: {e}")
         
         # App Navigation
-        app_mode = st.sidebar.selectbox(
+        app_mode = st.choice.selectbox(
             "Choose Application Mode", 
             ["Employee Card Generator", "Admin Panel"]
         )
         
         if app_mode == "Employee Card Generator":
-            st.title("🏢 Alpha Tech Employee Card Generator")
+            st.title("🏢 Alpha Tech Employee Card Generator By Haider Hussain")
             
             with st.sidebar:
                 st.header("Employee Details")
