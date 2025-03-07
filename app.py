@@ -105,7 +105,15 @@ class EmployeeCardGenerator:
             label_font = ImageFont.load_default()
             data_font = ImageFont.load_default()
         
-        # Company logo
+        # Card Design Colors
+        primary_color = (31, 97, 141)  # Dark Blue
+        
+        # Draw header
+        draw.rectangle([0, 0, card_width, 85], fill=primary_color)
+        draw.text((240, 24), "ALPHA TECH EMPLOYEE CARD", 
+                 fill='white', font=title_font)
+        
+        # Company logo - FIXED POSITIONING to appear within the blue header
         try:
             if isinstance(logo_path, str) and os.path.exists(logo_path):
                 logo = Image.open(logo_path)
@@ -119,8 +127,8 @@ class EmployeeCardGenerator:
                 else:
                     raise FileNotFoundError("Logo not found")
                 
-            logo = logo.resize((100, 100))
-            card.paste(logo, (50, 70), logo if logo.mode == 'RGBA' else None)
+            logo = logo.resize((80, 80))
+            card.paste(logo, (50, 2), logo if logo.mode == 'RGBA' else None)
         except Exception as e:
             st.error(f"Error loading logo: {e}")
         
@@ -147,14 +155,6 @@ class EmployeeCardGenerator:
                          fill='lightgray', outline='black')
             draw.text((card_width-250, 300), "PHOTO", 
                      fill='gray', font=label_font)
-        
-        # Card Design Colors
-        primary_color = (31, 97, 141)  # Dark Blue
-        
-        # Draw header
-        draw.rectangle([0, 0, card_width, 85], fill=primary_color)
-        draw.text((240, 24), "ALPHA TECH EMPLOYEE CARD", 
-                 fill='white', font=title_font)
         
         # Employee Details - Adjusted positioning to prevent overlap
         details = [
