@@ -370,6 +370,103 @@ class EmployeeCardGenerator:
         else:
             st.warning("Incorrect Admin Password")
 
+    def employee_card_generator(self):
+        """Employee Card Generator functionality"""
+        st.title("🏢 Alpha Tech Employee Card Generator By Haider Hussain")
+        
+        with st.sidebar:
+            st.header("Employee Details")
+            name = st.text_input("Employee Name")
+            cnic = st.text_input("CNIC Number")
+            age = st.number_input("Age", min_value=18, max_value=65)
+            role = st.selectbox("Role", [
+                "Software Engineer", "Data Analyst", "Project Manager", 
+                "HR Specialist", "Sales Executive", "Marketing Coordinator"
+            ])
+            city = st.text_input("City")
+            shift = st.selectbox("Shift", ["Morning", "Afternoon", "Night"])
+            
+            # Logo Upload
+            st.subheader("Company Logo")
+            logo = st.file_uploader("Upload Company Logo", type=['png', 'jpg', 'jpeg'])
+            
+            # Employee Photo Upload
+            st.subheader("Employee Photo")
+            employee_photo = st.file_uploader("Upload Employee Photo", type=['png', 'jpg', 'jpeg'])
+            
+            # Generate Card Button
+            if st.button("Generate Employee Card"):
+                if name and cnic:
+                    # Generate Unique ID
+                    unique_id = self.generate_unique_id()
+                    
+                    # Use company logo
+                    logo_path = "alpha_tech_logo.png"
+                    if logo:
+                        try:
+                            # Save uploaded logo
+                            with open(logo_path, "wb") as f:
+                                f.write(logo.getbuffer())
+                        except Exception as e:
+                            st.error(f"Error saving logo: {e}")
+                    
+                    # Save employee photo if uploaded
+                    photo_path = None
+                    if employee_photo:
+                        try:
+                            photo_path = f"employee_photo_{unique_id}.png"
+                            with open(photo_path, "wb") as f:
+                                f.write(employee_photo.getbuffer())
+                        except Exception as e:
+                            st.error(f"Error saving employee photo: {e}")
+                            photo_path = None
+                    
+                    # Prepare employee data
+                    employee_data = {
+                        'Unique ID': unique_id,
+                        'Name': name,
+                        'CNIC': cnic,
+                        'Age': age,
+                        'Role': role,
+                        'City': city,
+                        'Shift': shift,
+                        'Photo': photo_path  # Store the path to the photo
+                    }
+                    
+                    # Add to employees DataFrame
+                    new_employee = pd.DataFrame([employee_data])
+                    st.session_state.employees = pd.concat([
+                        st.session_state.employees, 
+                        new_employee
+                    ], ignore_index=True)
+                    
+                    # Save data
+                    self.save_data()
+                    
+                    # Create card
+                    card = self.create_employee_card(
+                        employee_data, 
+                        logo_path, 
+                        photo_path
+                    )
+                    
+                    # Display and Download Card
+                    buf = io.BytesIO()
+                    card.save(buf, format="PNG")
+                    byte_im = buf.getvalue()
+                    
+                    st.image(card, caption="Generated Employee Card")
+                    
+                    # Download Button
+                    st.download_button(
+                        label="Download Employee Card",
+                        data=byte_im,
+                        file_name=f"{unique_id}_{name}_employee_card.png",
+                        mime="image/png"
+                    )
+                else:
+                    st.warning("Please fill all required details")
+
     def main_app(self):
         """Main Streamlit Application"""
         st.set_page_config(
@@ -389,108 +486,30 @@ class EmployeeCardGenerator:
             except Exception as e:
                 st.error(f"Error creating default logo: {e}")
         
-        # App Navigation
-        app_mode = st.sidebar.selectbox(
-            "Choose Application Mode", 
-            ["Employee Card Generator", "Admin Panel"]
-        )
+        # Main title
+        st.title("🏢 Alpha Tech Employee Management System")
         
-        if app_mode == "Employee Card Generator":
-            st.title("🏢 Alpha Tech Employee Card Generator By Haider Hussain")
-            
-            with st.sidebar:
-                st.header("Employee Details")
-                name = st.text_input("Employee Name")
-                cnic = st.text_input("CNIC Number")
-                age = st.number_input("Age", min_value=18, max_value=65)
-                role = st.selectbox("Role", [
-                    "Software Engineer", "Data Analyst", "Project Manager", 
-                    "HR Specialist", "Sales Executive", "Marketing Coordinator"
-                ])
-                city = st.text_input("City")
-                shift = st.selectbox("Shift", ["Morning", "Afternoon", "Night"])
-                
-                # Logo Upload
-                st.subheader("Company Logo")
-                logo = st.file_uploader("Upload Company Logo", type=['png', 'jpg', 'jpeg'])
-                
-                # Employee Photo Upload
-                st.subheader("Employee Photo")
-                employee_photo = st.file_uploader("Upload Employee Photo", type=['png', 'jpg', 'jpeg'])
-                
-                # Generate Card Button
-                if st.button("Generate Employee Card"):
-                    if name and cnic:
-                        # Generate Unique ID
-                        unique_id = self.generate_unique_id()
-                        
-                        # Use company logo
-                        logo_path = "alpha_tech_logo.png"
-                        if logo:
-                            try:
-                                # Save uploaded logo
-                                with open(logo_path, "wb") as f:
-                                    f.write(logo.getbuffer())
-                            except Exception as e:
-                                st.error(f"Error saving logo: {e}")
-                        
-                        # Save employee photo if uploaded
-                        photo_path = None
-                        if employee_photo:
-                            try:
-                                photo_path = f"employee_photo_{unique_id}.png"
-                                with open(photo_path, "wb") as f:
-                                    f.write(employee_photo.getbuffer())
-                            except Exception as e:
-                                st.error(f"Error saving employee photo: {e}")
-                                photo_path = None
-                        
-                        # Prepare employee data
-                        employee_data = {
-                            'Unique ID': unique_id,
-                            'Name': name,
-                            'CNIC': cnic,
-                            'Age': age,
-                            'Role': role,
-                            'City': city,
-                            'Shift': shift,
-                            'Photo': photo_path  # Store the path to the photo
-                        }
-                        
-                        # Add to employees DataFrame
-                        new_employee = pd.DataFrame([employee_data])
-                        st.session_state.employees = pd.concat([
-                            st.session_state.employees, 
-                            new_employee
-                        ], ignore_index=True)
-                        
-                        # Save data
-                        self.save_data()
-                        
-                        # Create card
-                        card = self.create_employee_card(
-                            employee_data, 
-                            logo_path, 
-                            photo_path
-                        )
-                        
-                        # Display and Download Card
-                        buf = io.BytesIO()
-                        card.save(buf, format="PNG")
-                        byte_im = buf.getvalue()
-                        
-                        st.image(card, caption="Generated Employee Card")
-                        
-                        # Download Button
-                        st.download_button(
-                            label="Download Employee Card",
-                            data=byte_im,
-                            file_name=f"{unique_id}_{name}_employee_card.png",
-                            mime="image/png"
-                        )
-                    else:
-                        st.warning("Please fill all required details")
+        # Initialize app_mode in session state if not present
+        if 'app_mode' not in st.session_state:
+            st.session_state.app_mode = "Employee Card Generator"
         
+        # Create a horizontal layout for the mode selection buttons
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("Employee Card Generator", use_container_width=True):
+                st.session_state.app_mode = "Employee Card Generator"
+        
+        with col2:
+            if st.button("Admin Panel", use_container_width=True):
+                st.session_state.app_mode = "Admin Panel"
+        
+        # Add a separator
+        st.markdown("---")
+        
+        # Display appropriate section based on app_mode
+        if st.session_state.app_mode == "Employee Card Generator":
+            self.employee_card_generator()
         else:
             # Admin Panel
             self.admin_panel()
