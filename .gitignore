@@ -1,1 +1,15 @@
-.venv
+.venv/
+*.pyc
+__pycache__/
+build/
+dist/
+docs/_build/
+htmlcov/
+reports/
+.coverage
+.noseids
+nosetests.xml
+tox.ini
+MANIFEST.in
+setup.py
+README.rst
