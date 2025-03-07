@@ -372,7 +372,7 @@ class EmployeeCardGenerator:
 
     def employee_card_generator(self):
         """Employee Card Generator functionality"""
-        st.title("🏢 Alpha Tech Employee Card Generator By Haider Hussain")
+        st.title("🏢  Card Generator By Haider Hussain")
         
         with st.sidebar:
             st.header("Employee Details")
