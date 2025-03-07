@@ -390,7 +390,7 @@ class EmployeeCardGenerator:
                 st.error(f"Error creating default logo: {e}")
         
         # App Navigation
-        app_mode = st.choice.selectbox(
+        app_mode = st.sidebar.selectbox(
             "Choose Application Mode", 
             ["Employee Card Generator", "Admin Panel"]
         )
